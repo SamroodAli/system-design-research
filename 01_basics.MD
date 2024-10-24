@@ -3,7 +3,6 @@ What is system design ?
 - System design is typically designing large scale systems, basically how we scale up
 
 # Example of delicious
-
 1) First we got to buy a domain from a vendor like godaddy,namecheap etc
 - These vendors in turn buy our domain from ICANN. 
 ICANN is a Non profit entity that maintains these records. These vendors pay ICANN for maintenance and upkeep
@@ -55,18 +54,35 @@ and show appropriate pages and content. But now this is where we start facing is
 - When we update our code, we have to copy updated code, stop existing proces and start running the new code.
 This will lead to downtime
 - Our machines/laptops can restart/reboot/crash for various reasons. All these can lead to downtime
-- There can be other hardware issues or infrastructure issues like losing electricitiy
+- There can be other hardware issues or infrastructure issues like losing electricitiy. These also would lead to downtime
+- There is also limits to resources. One machine like a laptop has only limited resources like RAM, storage etc. We would
+soon reach bottlenecks here as well
 
+##  How will we solve these problems delicious faced ?
+- We can introduce multiple machines. This is a good idea but now have introduced multiple new problems like
+a) Which computer's IP address should we give in ICANN ?
+b) Should each of these new machines have their own database ?
 
+### Load balancer
+- We can setup one machine that routes incoming web traffic to other machines. This machine is called a load balancer and solves the
+problem of needing to setup each IP address of each machine in ICANN
+- Ofcourse now load balancer would be a single point of failure. To solve this, we can introduce `redundancy` 
+by setting up multiple load balancers and buy multiple static IP addresses for each load balancer. 
+ICANN does let us map multiple IP addresses to one domain.
 
+```bash
+dig devstoic.com
+```
+Using `dig`, we can find out all the static IP addresses associated with a domain
 
+- Now have solved the problem of having limited resources with multiple machines and solved
+the problem of ICANN domain-ip mapping by setting up load balancers
 
+### Would load balancers go down
+- A single load balancer can become a single point of failure which is why we can have multiple
+load balancers each with it's own static IP address
+- Load balancers are very thin clients in that all they do is route incoming traffic to other machines
+- We would have changes in our codebase but changes to load balancer routing logic is very very rare if it even happens,
+so there are no code deployments or downtime with load balancers that we need to worry about
 
-
-
-
-
-
-
-
-
+Because of all these reasons, the chance of a load balance going down is very very low.
